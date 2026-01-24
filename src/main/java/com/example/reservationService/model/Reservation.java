@@ -1,57 +1,49 @@
 package com.example.reservationService.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "RESERVATION")
+@Table(name = "reservations")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private User client;
+    @Future
+    @NotNull
+    private LocalDateTime reservationTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "provider_id")
+    private Provider provider;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_offering_id")
     private ServiceOffering serviceOffering;
 
-    private LocalDateTime reservationTime = LocalDateTime.now();
-    public enum Status {
-        PENDING,
-        FULFILLED,
-        CANCELED
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Reservation)) return false;
+        return id != null && id.equals(((Reservation) o).getId());
     }
 
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
-    protected Reservation() {}
-
-    public Reservation(Long id, User client, ServiceOffering serviceOffering,
-                       LocalDateTime reservationTime, Status status) {
-        this.id = id;
-        this.client = client;
-        this.serviceOffering = serviceOffering;
-        this.reservationTime = reservationTime;
-        this.status = status;
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
-    @Transient
-    public String getDisplayId() {
-        return "R" + id;
-    }
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public User getClient() { return client; }
-    public void setClient(User client) { this.client = client; }
-
-    public ServiceOffering getServiceOffering() { return serviceOffering; }
-    public void setServiceOffering(ServiceOffering serviceOffering) { this.serviceOffering = serviceOffering; }
-
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
 }

@@ -1,59 +1,47 @@
 package com.example.reservationService.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
-@Table(name = "SERVICEOFFERINGS")
+@Table(name = "service_offerings")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ServiceOffering {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @NotBlank
+    private String serviceName;
 
-    private String describtion;
+    @NotNull
+    private BigDecimal price;
 
-    private double price;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_id")
-    private User provider;
+    private Provider provider;
 
-    private boolean isReserved = false;
+    @OneToMany(mappedBy = "serviceOffering", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reservation> reservations;
 
-    protected ServiceOffering() {}
-
-    public ServiceOffering(Long id, String name, String describtion, double price,
-                           User provider, boolean isReserved) {
-        this.id = id;
-        this.name = name;
-        this.describtion = describtion;
-        this.price = price;
-        this.provider = provider;
-        this.isReserved = isReserved;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ServiceOffering)) return false;
+        return id != null && id.equals(((ServiceOffering) o).getId());
     }
 
-    @Transient
-    public String getDisplayId() {
-        return "S" + id;
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getDescribtion() { return describtion; }
-    public void setDescribtion(String describtion) { this.describtion = describtion; }
-
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
-
-    public User getProvider() { return provider; }
-    public void setProvider(User provider) {
-        this.provider = provider;
-    }
-    public boolean getIsReserved() { return isReserved; }
-    public void setIsReserved(boolean isReserved) { this.isReserved = isReserved; }
 }

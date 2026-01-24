@@ -1,47 +1,43 @@
 package com.example.reservationService.model;
 
 import jakarta.persistence.*;
-
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 @Entity
-@Table(name ="USERS")
+@Table(name = "users")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @NotBlank
+    private String fullName;
+
+    @Email
+    @NotBlank
+    @Column(unique = true)
     private String email;
-    private String password;
 
-    public enum Role{
-        ADMIN,
-        PROVIDER,
-        CLIENT
+    @NotBlank
+    private String phoneNumber;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        return id != null && id.equals(((User) o).getId());
     }
-    @Enumerated(EnumType.STRING)
-    private Role role;
-    protected User() {}
-    public User (String name, String email, String password, Role role){
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
-    @Transient
-    public String getDisplayId() {
-        return "U" + id;
-    }
-    public Long getId() {return id;}
-    public void setId(Long id) {this.id = id;}
-    public String getName() {return name;}
-    public void setName(String name) {this.name = name;}
-    public String getEmail() {return email;}
-    public void setEmail(String email) {this.email = email;}
-    public String getPassword() {return password;}
-    public void setPassword(String password) {this.password = password;}
-    public Role getRole() {return role;}
-    public void setRole(Role role) {this.role = role;}
 }
-
-
